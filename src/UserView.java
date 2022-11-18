@@ -4,7 +4,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 /* ******************************************************************************************************
- * UI opened by users im tired
+ * UI opened for users im tired
  * ******************************************************************************************************/
 public class UserView extends JFrame {
     private User currentUser;
@@ -93,7 +93,6 @@ public class UserView extends JFrame {
             currentUser.update(recentMessage);
             currentUser.notifyUsers(recentMessage);
             currentUser.addTweet(recentMessage);
-            System.out.println("TWEET BUTTON");
             tweetTextField.setText("");
 
         }
