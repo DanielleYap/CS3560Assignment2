@@ -1,5 +1,3 @@
-import Visitors.*;
-
 import javax.swing.*;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -8,8 +6,12 @@ import javax.swing.tree.TreeModel;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import java.util.HashMap;
 
+/* ******************************************************************************************************
+ * Main controller of the program
+ * ******************************************************************************************************/
 public class AdminControlPanel extends JFrame {
 
     // SINGLETON - Static instantiation
@@ -17,9 +19,19 @@ public class AdminControlPanel extends JFrame {
 
     private HashMap<String, User> users = new HashMap<>();
     private HashMap<String, Group> groups = new HashMap<>();
+    private ArrayList<SysEntry> usersAndGroups = new ArrayList<>();
     private User newUser;
+    private Group group = new Group("group");
 
-    // GUI elements
+    UserTotalVisitor userTotalVisitor;
+    GroupTotalVisitor groupTotalVisitor;
+    MessageTotalVisitor messageTotalVisitor;
+    PositivePercentVisitor positivePercentVisitor;
+    int userTotal;
+    int groupTotal;
+    int messageTotal;
+    double positivePercent;
+
     private JPanel adminPanel;
     private JTree adminTreeView;
     private TreeModel adminTreeModel;
@@ -34,17 +46,14 @@ public class AdminControlPanel extends JFrame {
                     showGroupTotalButton,
                     showMessagesTotalButton,
                     showPositivePercentButton;
-    private UserTotalVisitor totalUsers = new UserTotalVisitor();
-    private GroupTotalVisitor totalGroups = new GroupTotalVisitor();
-    private PositivePercentVisitor positivePercent = new PositivePercentVisitor();
-    private int totalMessages =0;
 
-    // SINGLETON - Private constructor
+    /* ******************************************************************************************************
+     * SINGLETON
+     * Private constructor and static getter
+     * ******************************************************************************************************/
     private AdminControlPanel() {
         generateAdminControlPanel();
     }
-
-    // SINGLETON - Static getter
     public static AdminControlPanel getInstance() {
         if (adminControl == null) {
             synchronized (AdminControlPanel.class) {
@@ -56,15 +65,20 @@ public class AdminControlPanel extends JFrame {
         return adminControl;
     }
 
+    /* ******************************************************************************************************
+     * User and group getters
+     * ******************************************************************************************************/
     public HashMap<String, User> getUsers() {
         return users;
     }
 
-    public void setTotalMessages(int totalMessages) {
-        this.totalMessages = totalMessages;
+    public HashMap<String, Group> getGroups() {
+        return groups;
     }
 
-    // Generate GUI Componenents
+    /* ******************************************************************************************************
+     * Generates admin panel UI
+     * ******************************************************************************************************/
     private void generateAdminControlPanel() {
         // Set initials of panel
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -73,7 +87,6 @@ public class AdminControlPanel extends JFrame {
         adminPanel = new JPanel();
         adminPanel.setLayout(null);
         setContentPane(adminPanel);
-
 
         // make tree
         rootGroup = new DefaultMutableTreeNode("Root", true);
@@ -91,7 +104,6 @@ public class AdminControlPanel extends JFrame {
         groupTextField.setBounds(320,45,200,25);
         adminPanel.add(groupTextField);
 
-
         // make buttons
         addUserButton = new JButton("Add User");
         addUserButton.setBounds(527,10,147,24);
@@ -103,12 +115,10 @@ public class AdminControlPanel extends JFrame {
         addGroupButton.addActionListener(new AddGroupButton());
         adminPanel.add(addGroupButton);
 
-
         openUserViewButton = new JButton("Open User View");
         openUserViewButton.setBounds(320,85,355,40);
         openUserViewButton.addActionListener(new OpenUserViewButton());
         adminPanel.add(openUserViewButton);
-
 
         showUserTotalButton = new JButton("User Total");
         showUserTotalButton.setBounds(320,460,170,40);
@@ -131,9 +141,10 @@ public class AdminControlPanel extends JFrame {
         adminPanel.add(showPositivePercentButton);
     }
 
-    // button functionalities
+    /* ******************************************************************************************************
+     * Button functionalities
+     * ******************************************************************************************************/
     private class AddUserButton implements ActionListener {
-
         @Override
         public void actionPerformed(ActionEvent e) {
             String userID = userTextField.getText();
@@ -146,15 +157,13 @@ public class AdminControlPanel extends JFrame {
 
             newUser = new User(userID);
             users.put(userID, newUser);
-
-            totalUsers.accept(new ButtonVisitor());
+            usersAndGroups.add(newUser);
 
             ((DefaultTreeModel) adminTreeModel).reload();
         }
     }
 
     private class AddGroupButton implements ActionListener {
-
         @Override
         public void actionPerformed(ActionEvent e) {
             String groupID = groupTextField.getText();
@@ -167,8 +176,7 @@ public class AdminControlPanel extends JFrame {
 
             Group newGroup = new Group(groupID);
             groups.put(groupID, newGroup);
-
-            totalGroups.accept(new ButtonVisitor());
+            usersAndGroups.add(newGroup);
 
             ((DefaultTreeModel) adminTreeModel).reload();
         }
@@ -186,36 +194,44 @@ public class AdminControlPanel extends JFrame {
         }
     }
 
+    /* *****************************************************************************************************
+     * VISITOR
+     * Button functionalities for buttons using the visitor pattern
+     * ******************************************************************************************************/
     private class ShowUserTotalButton implements ActionListener {
-
         @Override
         public void actionPerformed(ActionEvent e) {
-            JOptionPane.showMessageDialog(null, "Total Users:\n" + totalUsers.getUserTotal());
+            userTotalVisitor = new UserTotalVisitor();
+            userTotal = (int)(group.accept(userTotalVisitor));
+            JOptionPane.showMessageDialog(null, "Total Users:\n" + userTotal);
         }
     }
 
     private class ShowGroupTotalButton implements ActionListener {
-
         @Override
         public void actionPerformed(ActionEvent e) {
-            JOptionPane.showMessageDialog(null, "Total Groups:\n" + totalGroups.getGroupTotal());
+            groupTotalVisitor = new GroupTotalVisitor();
+            groupTotal = (int)(group.accept(groupTotalVisitor));
+            JOptionPane.showMessageDialog(null, "Total Groups:\n" + groupTotal);
         }
     }
 
     private class ShowMessagesTotalButton implements ActionListener {
-
         @Override
         public void actionPerformed(ActionEvent e) {
-            JOptionPane.showMessageDialog(null, "Total Messages:\n" + totalMessages);
-
+            messageTotalVisitor = new MessageTotalVisitor();
+            messageTotal = (int)(group.accept(messageTotalVisitor));
+            JOptionPane.showMessageDialog(null, "Total Messages:\n" + messageTotal);
         }
     }
 
     private class ShowPositivePercentButton implements ActionListener {
-
         @Override
         public void actionPerformed(ActionEvent e) {
-            JOptionPane.showMessageDialog(null, "Positive Messages Percent:\n" + positivePercent.getPositivePercent(totalMessages));
+            positivePercentVisitor = new PositivePercentVisitor();
+            positivePercent = group.accept(positivePercentVisitor);
+            JOptionPane.showMessageDialog(null, "Positive Percent:\n" + positivePercent);
+
         }
     }
 

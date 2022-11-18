@@ -1,3 +1,7 @@
-public interface SysEntry {
+/* ******************************************************************************************************
+ * COMPOSITE
+ * Interface for users and groups
+ * ******************************************************************************************************/
+public interface SysEntry extends Visitable{
     String getID();
 }

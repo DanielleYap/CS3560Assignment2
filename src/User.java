@@ -2,17 +2,20 @@ import javax.swing.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/* ******************************************************************************************************
+ * COMPOSITE
+ * The user
+ * ******************************************************************************************************/
 public class User extends Subject implements Observer, SysEntry{
 
     private String userID;
 
     private HashMap<String, User> userFollowers;
     private HashMap<String, User> userFollowing;
-    private ArrayList<String> userFeed;
     private JList newsFeedList;
     private DefaultListModel newsFeedListModel;
     private HashMap<String, User> users = AdminControlPanel.getInstance().getUsers();
-    private String recentMessage;
+    private ArrayList<String> tweets = new ArrayList<>();
 
     public User(String ID) {
         userID = ID;
@@ -27,6 +30,10 @@ public class User extends Subject implements Observer, SysEntry{
         return userID;
     }
 
+    public ArrayList<String> getTweets() {
+        return tweets;
+    }
+
     public DefaultListModel getNewsFeedListModel() {
         return newsFeedListModel;
     }
@@ -35,23 +42,18 @@ public class User extends Subject implements Observer, SysEntry{
         return newsFeedList;
     }
 
-    public HashMap<String, User> getUserFollowers() {
-        return userFollowers;
-    }
-
-    public HashMap<String, User> getUserFollowing() {
-        return userFollowing;
-    }
-
-    public String getRecentMessage() {
-        return recentMessage;
+    public void addTweet(String tweet) {
+        tweets.add(tweet);
     }
 
     @Override
     public void update(String tweet) {
         newsFeedListModel.addElement(tweet);
         newsFeedList.setModel(newsFeedListModel);
-        System.out.println(tweet);
-        System.out.println("UPDATE CALLED");
+    }
+
+    @Override
+    public double accept(Visitor visitor) {
+        return 0;
     }
 }

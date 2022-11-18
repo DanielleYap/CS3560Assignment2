@@ -1,5 +1,7 @@
-import java.util.HashMap;
-
+/* ******************************************************************************************************
+ * COMPOSITE
+ * Class that is able to hold users and other groups
+ * ******************************************************************************************************/
 public class Group implements SysEntry{
 
     private String groupID;
@@ -13,4 +15,8 @@ public class Group implements SysEntry{
         return groupID;
     }
 
+    @Override
+    public double accept(Visitor visitor) {
+        return visitor.visit(this);
+    }
 }

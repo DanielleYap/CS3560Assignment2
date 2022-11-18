@@ -1,13 +1,12 @@
-import Visitors.ButtonVisitor;
-import Visitors.MessageTotalVisitor;
-import Visitors.PositivePercentVisitor;
-
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
+/* ******************************************************************************************************
+ * UI opened by users im tired
+ * ******************************************************************************************************/
 public class UserView extends JFrame {
-    // GUI elements
     private User currentUser;
     private JPanel userPanel;
     private JTextField userTextField,
@@ -16,11 +15,9 @@ public class UserView extends JFrame {
                   newsFeedList;
     private JButton followUserButton,
                     postTweetButton;
-    private ListModel<String> currentFollowingListModel,
-                              newsFeedListModel1;
+    private ListModel<String> currentFollowingListModel;
     private AdminControlPanel admin = AdminControlPanel.getInstance();
-    private MessageTotalVisitor totalMessages = new MessageTotalVisitor();
-    private int tm;
+    private ArrayList<String> tweetList = new ArrayList<>();
 
     public UserView(User user) {
         currentUser = user;
@@ -93,25 +90,12 @@ public class UserView extends JFrame {
         public void actionPerformed(ActionEvent e) {
             String recentMessage = ""+ currentUser.getID() + ": " + tweetTextField.getText();
 
+            currentUser.update(recentMessage);
             currentUser.notifyUsers(recentMessage);
+            currentUser.addTweet(recentMessage);
             System.out.println("TWEET BUTTON");
-            currentUser.getNewsFeedListModel().addElement(recentMessage);
             tweetTextField.setText("");
 
-            totalMessages = new MessageTotalVisitor();
-            totalMessages.accept(new ButtonVisitor());
-            tm++;
-
-
-            PositivePercentVisitor positivePercent = new PositivePercentVisitor();
-            String[] positiveWords = {"yes", "good", "great", "amazing"};
-            for (String word : positiveWords) {
-                if (recentMessage.contains(word)) {
-                    positivePercent.accept(new ButtonVisitor());
-                }
-            }
-
-            admin.setTotalMessages(tm);
         }
     }
 }
