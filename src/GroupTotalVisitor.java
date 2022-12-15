@@ -14,4 +14,9 @@ public class GroupTotalVisitor implements Visitor {
 
         return groupTotal;
     }
+
+    @Override
+    public double visit(User user) {
+        return 0;
+    }
 }

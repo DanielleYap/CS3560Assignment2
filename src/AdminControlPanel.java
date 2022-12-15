@@ -27,10 +27,17 @@ public class AdminControlPanel extends JFrame {
     GroupTotalVisitor groupTotalVisitor;
     MessageTotalVisitor messageTotalVisitor;
     PositivePercentVisitor positivePercentVisitor;
+    VerifyIDVisitor verifyIDVisitor = new VerifyIDVisitor();
+    LastUpdatedVisitor lastUpdatedVisitor = new LastUpdatedVisitor();;
     int userTotal;
     int groupTotal;
     int messageTotal;
     double positivePercent;
+    int verifyID;
+    int lastUpdated;
+
+    String verifyMessage;
+
 
     private JPanel adminPanel;
     private JTree adminTreeView;
@@ -45,7 +52,9 @@ public class AdminControlPanel extends JFrame {
                     showUserTotalButton,
                     showGroupTotalButton,
                     showMessagesTotalButton,
-                    showPositivePercentButton;
+                    showPositivePercentButton,
+                    verifyIDButton,
+                    lastUpdatedUserButton;
 
     /* ******************************************************************************************************
      * SINGLETON
@@ -139,6 +148,16 @@ public class AdminControlPanel extends JFrame {
         showPositivePercentButton.setBounds(500,510,170,40);
         showPositivePercentButton.addActionListener(new ShowPositivePercentButton());
         adminPanel.add(showPositivePercentButton);
+
+        verifyIDButton = new JButton("ID Verification");
+        verifyIDButton.setBounds(320,410,170,40);
+        verifyIDButton.addActionListener(new VerifyIDButton());
+        adminPanel.add(verifyIDButton);
+
+        lastUpdatedUserButton = new JButton("Last Updated User");
+        lastUpdatedUserButton.setBounds(500,410,170,40);
+        lastUpdatedUserButton.addActionListener(new LastUpdatedUserButton());
+        adminPanel.add(lastUpdatedUserButton);
     }
 
     /* ******************************************************************************************************
@@ -235,4 +254,45 @@ public class AdminControlPanel extends JFrame {
         }
     }
 
+    private class VerifyIDButton implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+
+
+            for (User user : users.values()) {
+                verifyID = (int)(user.accept(verifyIDVisitor));
+                if (verifyID==1) {
+                    verifyMessage = "All ID's are valid.";
+                }
+                else {
+                    verifyMessage = "There is an invalid ID present. :(";
+                    break;
+                }
+            }
+            for (Group g : groups.values()) {
+                verifyID = (int)(g.accept(verifyIDVisitor));
+                if (verifyID==1) {
+                    verifyMessage = "All ID's are valid.";
+                }
+                else {
+                    verifyMessage = "There is an invalid ID present. :(";
+                    break;
+                }
+            }
+            JOptionPane.showMessageDialog(null, verifyMessage);
+
+        }
+    }
+
+    private class LastUpdatedUserButton implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            for (User user : users.values()) {
+                lastUpdated = (int)(user.accept(lastUpdatedVisitor));
+                if (lastUpdated == 1) {
+                    JOptionPane.showMessageDialog(null, "Last updated user:\n" + user.getID());
+                }
+            }
+        }
+    }
 }

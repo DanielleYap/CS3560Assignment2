@@ -38,5 +38,10 @@ public class PositivePercentVisitor implements Visitor {
         return positivePercent;
     }
 
+    @Override
+    public double visit(User user) {
+        return 0;
+    }
+
 
 }

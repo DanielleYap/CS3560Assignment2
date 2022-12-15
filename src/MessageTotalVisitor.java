@@ -18,5 +18,8 @@ public class MessageTotalVisitor implements Visitor {
         return messageTotal;
     }
 
-
+    @Override
+    public double visit(User user) {
+        return 0;
+    }
 }

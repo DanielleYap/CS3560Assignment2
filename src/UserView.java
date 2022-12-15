@@ -2,6 +2,9 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /* ******************************************************************************************************
  * UI opened for users im tired
@@ -18,6 +21,8 @@ public class UserView extends JFrame {
     private ListModel<String> currentFollowingListModel;
     private AdminControlPanel admin = AdminControlPanel.getInstance();
     private ArrayList<String> tweetList = new ArrayList<>();
+    private long lastUpdateTime;
+
 
     public UserView(User user) {
         currentUser = user;
@@ -93,8 +98,18 @@ public class UserView extends JFrame {
             currentUser.update(recentMessage);
             currentUser.notifyUsers(recentMessage);
             currentUser.addTweet(recentMessage);
-            tweetTextField.setText("");
 
+            lastUpdateTime = System.currentTimeMillis();
+            currentUser.setLastUpdateTime(lastUpdateTime);
+
+            DateFormat format = new SimpleDateFormat("dd MMM yyyy HH:mm:ss:SSS Z");
+            Date date;
+
+            date = new Date(lastUpdateTime);
+
+            System.out.println("User " + currentUser.getID() + " updated at: " + format.format(date));
+
+            tweetTextField.setText("");
         }
     }
 }
